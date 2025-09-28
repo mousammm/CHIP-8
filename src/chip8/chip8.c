@@ -1,8 +1,8 @@
 #include "chip8.h"
-#include <stdio.h>
+#include <stdio.h> // printf
 #include <stdlib.h> // rand
-#include <stdint.h>
-#include <stdbool.h>
+#include <stdint.h> // uint8
+#include <stdbool.h> //bool
 #include <time.h> // time 
 #include <string.h> // memset and memcpy 
 
@@ -42,19 +42,27 @@ void chip8_init(chip8_t *chip8){
 
 bool chip8_load_rom(chip8_t *chip8,const char *filename){
    FILE *file = fopen(filename, "rb");
-   // if !file
+
+   if(!file){
+      fprintf(stderr, "Cannot open %s file\n",filename);
+      return false;
+   }
 
    fseek(file,0,SEEK_END);
    long size = ftell(file);
    rewind(file);
 
-   if(size>4096 - 0x200){
+   if(size > MEMORY - 0x200){
       fprintf(stderr, "ROM too big: %ld bytes\n",size);
       fclose(file);
       return false;
    }
    
-   fread(&chip8->memory[0x200],1,size,file);
+   if (!fread(&chip8->memory[0x200],1,size,file)) {
+      fprintf(stderr, "Cant read %s into memory!\n",filename);
+      return false;
+   }
+
    fclose(file);
    return true; 
 }
@@ -185,8 +193,8 @@ void chip8_cycle(chip8_t *chip8){
          
       case 0xD000: // Dxyn - Draw sprite at (Vx, Vy) with n bytes of sprite data
          {
-            uint8_t x_pos = chip8->V[x] % 64;
-            uint8_t y_pos = chip8->V[y] % 32;
+            uint8_t x_pos = chip8->V[x] % DISPLAY_WIDTH;
+            uint8_t y_pos = chip8->V[y] % DISPLAY_HEIGHT;
             chip8->V[0xF] = 0;
             
             for(int row = 0; row < n; row++) {
@@ -194,9 +202,9 @@ void chip8_cycle(chip8_t *chip8){
                
                for(int col = 0; col < 8; col++) {
                   if((sprite_byte & (0x80 >> col)) != 0) {
-                     int pixel_x = (x_pos + col) % 64;
-                     int pixel_y = (y_pos + row) % 32;
-                     int pixel_index = pixel_y * 64 + pixel_x;
+                     int pixel_x = (x_pos + col) % DISPLAY_WIDTH;
+                     int pixel_y = (y_pos + row) % DISPLAY_HEIGHT;
+                     int pixel_index = pixel_y * DISPLAY_WIDTH + pixel_x;
                      
                      if(chip8->display[pixel_index] == 1) {
                         chip8->V[0xF] = 1;

@@ -11,7 +11,7 @@ bool sdl_init(sdl_t *sdl){
      }   
 
    // create a window 
-    sdl->window = SDL_CreateWindow("Chip8",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,SCALE_WINDOW*64,SCALE_WINDOW*32,SDL_WINDOW_SHOWN);
+    sdl->window = SDL_CreateWindow("Chip8",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,SCALE_WINDOW*DISPLAY_WIDTH,SCALE_WINDOW*DISPLAY_HEIGHT,SDL_WINDOW_SHOWN);
     if (!sdl->window) {
         fprintf(stderr, "Could not create Window: %s\n",SDL_GetError());
         return false; //failed

@@ -1,22 +1,29 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include <stdint.h> // uint8/16
+#include <stdbool.h> // bool
+
+#define MEMORY 4096
+#define REGISTER 16
+#define STACK 16
+#define DISPLAY_WIDTH 64
+#define DISPLAY_HEIGHT 32
+#define NUM_PAD 16
 
 
 //chip8 define
 typedef struct  {
-  uint8_t memory[4096];   //4kb ram/memory
-  uint8_t V[16];           // 16 8-bit register 
+  uint8_t memory[MEMORY];   //4kb ram/memory
+  uint8_t V[REGISTER];           // 16 8-bit register 
   uint16_t I;               // Index register 
   uint16_t pc;            // Program counter
   uint8_t sp;             // stack pointer
-  uint16_t stack[16];     // stack
+  uint16_t stack[STACK];     // stack
   uint8_t delay_timer;    // delay timer
   uint8_t sound_timer;    // sound timer
-  uint8_t display[64*32]; // 64*32 pixel display
-  bool keypad[16];  // keypad state [0-F]
+  uint8_t display[DISPLAY_WIDTH*DISPLAY_HEIGHT]; // 64*32 pixel display
+  bool keypad[NUM_PAD];  // keypad state [0-F]
   bool draw_flag;         // redraw flag 
 } chip8_t ;
 

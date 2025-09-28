@@ -6,7 +6,8 @@
 
 int main(int argc,char **argv){
    if (argc < 2) {
-    printf("Usage: %s <rom_file>\n",argv[0]);
+    printf("Usage: %s <path/to/rom_file>\n",argv[0]);
+    return EXIT_FAILURE;
    }
 
    //initialize chip8
@@ -42,7 +43,7 @@ int main(int argc,char **argv){
          sdl_render_frame(&sdl,&chip8);
       }
 
-      SDL_Delay(1);
+      SDL_Delay(FPS);
     }
 
    // sdl cleanup

@@ -1,4 +1,18 @@
-CFLAGS=-std=c17 -Wall -Wextra -Werror
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99
+SDL_FLAGS = -lSDL2
 
-all:
-	gcc src/main.c src/sdl/sdl.c -o chip8 $(CFLAGS) `pkg-config --cflags --libs sdl2`
+SRC = src/main.c src/chip8/chip8.c src/sdl/sdl.c
+OBJ = $(SRC:.c=.o)
+TARGET = chip8
+
+$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $(TARGET) $(SDL_FLAGS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(OBJ) $(TARGET)
+
+.PHONY: clean

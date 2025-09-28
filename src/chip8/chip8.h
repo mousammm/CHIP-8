@@ -1,4 +1,4 @@
-#ifdef CHIP8_H
+#ifndef CHIP8_H
 #define CHIP8_H
 
 #include <stdint.h>

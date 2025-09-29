@@ -25,7 +25,6 @@ int main(int argc,char **argv){
    sdl_t sdl = {0};
    if(!sdl_init(&sdl)) exit(EXIT_FAILURE);
    printf("SDL Initialise successful!\n");
-   printf("SDL Fps 60 successful!\n");
 
    // sdl show display
    bool running = true;
@@ -52,6 +51,6 @@ int main(int argc,char **argv){
    sdl_cleanup(&sdl);
    printf("SDL cleanup Successful!\n");
 
-    exit(EXIT_SUCCESS);
+   exit(EXIT_SUCCESS);
 }
 

@@ -11,7 +11,6 @@
 #define DISPLAY_HEIGHT 32
 #define NUM_PAD 16
 
-
 //chip8 define
 typedef struct  {
   uint8_t memory[MEMORY];                         // 4kb ram/memory
@@ -27,12 +26,10 @@ typedef struct  {
   bool draw_flag;                                 // redraw flag 
 } chip8_t ;
 
- 
 //chip8 function declaration 
 void chip8_init(chip8_t *chip8);
 bool chip8_load_rom(chip8_t *chip8, const char *filename);
 void chip8_cycle(chip8_t *chip8);
 void chip8_timers(chip8_t *chip8);
-
 
 #endif // CHIP8_H

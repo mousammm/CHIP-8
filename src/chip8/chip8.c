@@ -171,10 +171,39 @@ void chip8_cycle(chip8_t *chip8){
               Skips next instruction if they are equal
               Conditional skip - doesn't always execute
             */
-         printf("SE V%X, 0x%02X (Skip V[%X]==kk[0x%02X])", x, kk , x , kk);
+         printf("SE V%X, 0x%02X (Skip next inst if V[%X]==kk[0x%02X])", x, kk , x , kk);
          if(chip8->V[x] == kk) chip8->pc += 2;
       break; // 0x3 end
       
+      case 0x4: // 4xkk - Skip if Vx != kk (opposite of 0x3)
+         printf("SNE V%X 0x%03X (Skip next ins if V[%X]!=kk[0x%03X])", x , kk , x , kk);
+         if(chip8->V[x] != kk) chip8->pc += 2;
+      break; // 0x4 end
+
+      case 0x5: // 5xy0 - Skip if Vx == Vy
+         printf("SE V%X, V%X (Skip next inst if V%X==y[V%X])", x, y , x , y);
+         if(chip8->V[x] == chip8->V[y]) chip8->pc += 2;
+      break; // 0x5 end 
+
+      case 0x6: // 6xkk - LD Vx, byte (Load immediate value into register)
+         printf("LD V%X, 0x%02X (Set V%X=kk[0x%2X])", x, kk , x , kk );
+         chip8->V[x] = kk;
+      break; // 0x6 end 
+ 
+      case 0x7: // 7xkk - Add kk to Vx
+         /*
+             opcode = 0x7105
+             first_nibble = 0x7
+             x = 0x1      // Register V1
+             kk = 0x05    // Value to add
+             
+             // Execution:
+             chip8->V[1] += 0x05;  // Simple addition (no carry flag)
+            */
+         printf("ADD V%X, 0x%02X (Add V%X+=kk[0x%02X])", x, kk , x, kk);
+         chip8->V[x] += kk;
+      break; // 0x7 end
+ 
    } // switch end 
 
 }

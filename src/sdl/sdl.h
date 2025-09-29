@@ -9,8 +9,6 @@
 #define TARGET_FPS 60
 #define FPS (1000 / TARGET_FPS )
 
-
-
 typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -22,4 +20,4 @@ void sdl_cleanup(sdl_t *sdl);
 void sdl_render_frame(sdl_t *sdl,chip8_t *chip8);
 bool sdl_handle_inputs(chip8_t *chip8);
 
-#endif // SDL_H
+#endif 

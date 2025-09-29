@@ -1,9 +1,9 @@
 #include "chip8.h"
-#include <stdio.h> // printf
+#include <stdio.h> 
 #include <stdlib.h> // rand
-#include <stdint.h> // uint8
-#include <stdbool.h> //bool
-#include <time.h> // time 
+#include <stdint.h> 
+#include <stdbool.h> 
+#include <time.h> 
 #include <string.h> // memset and memcpy 
 
 // chip8 fontset 
@@ -41,8 +41,9 @@ void chip8_init(chip8_t *chip8){
 }
 
 bool chip8_load_rom(chip8_t *chip8,const char *filename){
-   FILE *file = fopen(filename, "rb");
 
+   // open file 
+   FILE *file = fopen(filename, "rb");
    if(!file){
       fprintf(stderr, "Cannot open %s file\n",filename);
       return false;
@@ -52,12 +53,14 @@ bool chip8_load_rom(chip8_t *chip8,const char *filename){
    long size = ftell(file);
    rewind(file);
 
+   // check if file is big
    if(size > MEMORY - 0x200){
       fprintf(stderr, "ROM too big: %ld bytes\n",size);
       fclose(file);
       return false;
    }
    
+   // read into the memory
    if (!fread(&chip8->memory[0x200],1,size,file)) {
       fprintf(stderr, "Cant read %s into memory!\n",filename);
       return false;

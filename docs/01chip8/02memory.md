@@ -63,6 +63,3 @@ We need this understanding to:
 - **Implement accurate CHIP-8 emulators**
 
 ---
-
-
-

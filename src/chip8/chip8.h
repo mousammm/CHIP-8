@@ -17,8 +17,8 @@ typedef struct  {
   uint8_t V[REGISTER];                            // 16 8-bit register VF=carry flag
   uint16_t I;                                     // Index register 
   uint16_t pc;                                    // Program counter
-  uint8_t sp;                                     // stack pointer
   uint16_t stack[STACK];                          // stack
+  uint8_t sp;                                     // stack pointer
   uint8_t delay_timer;                            // delay timer
   uint8_t sound_timer;                            // sound timer
   uint8_t display[DISPLAY_WIDTH*DISPLAY_HEIGHT];  // 64*32 pixel display

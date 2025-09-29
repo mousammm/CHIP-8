@@ -39,6 +39,22 @@ void sdl_render_frame(sdl_t *sdl, chip8_t *chip8){
 
       //draw pixel with white color 
        SDL_SetRenderDrawColor(sdl->renderer,255,255,255,255); // set fg color white
+    
+    /*
+           Display grid:
+           [1][0][1]  (y=0: indices 0,1,2)
+           [0][1][0]  (y=1: indices 3,4,5) 
+           [1][0][1]  (y=2: indices 6,7,8)
+
+           y=0, x=0
+           chip8->display[0 * 3 + 0] = chip8->display[0] = 1 → DRAW
+           
+           y=0, x=1
+           chip8->display[0 * 3 + 1] = chip8->display[1] = 0 → SKIP
+
+           basically the for loop is checking the every value in 
+           chip8->[64*32] is 0 or 1 if its 1 draw 
+    */
        
         for (int y = 0; y < DISPLAY_HEIGHT; y++) {
         for (int x = 0; x < DISPLAY_WIDTH; x++) {

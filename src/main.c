@@ -47,6 +47,7 @@ int main(int argc,char **argv){
       SDL_Delay(FPS);
     }
 
+   printf("\n");
    // sdl cleanup
    sdl_cleanup(&sdl);
    printf("SDL cleanup Successful!\n");

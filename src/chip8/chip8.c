@@ -82,205 +82,99 @@ void chip8_timers(chip8_t *chip8){
    }
 }
 
+
+
 void chip8_cycle(chip8_t *chip8){
+   /* Bitwise operation & bit masking
+    chip8->memory[chip8->pc] << 8 = 0x12 << 8 = 0x1200
+    chip8->memory[chip8->pc+1] = 0x34
+    0x1200 | 0x34 = 0x1234 ← The complete 16-bit opcode!
+
+    CHIP-8 is big-endian: most significant byte comes first in memory
+    memory[pc] is the high byte, memory[pc+1] is the low byte
+    The shift and OR preserves this ordering correctly
+   */
    uint16_t opcode = (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc+1];
    chip8->pc += 2;
 
-   // Decode opcode
-   uint16_t nnn = opcode & 0x0FFF;
-   uint8_t n = opcode & 0x000F;
-   uint8_t x = (opcode & 0x0F00) >> 8;
-   uint8_t y = (opcode & 0x00F0) >> 4;
-   uint8_t kk = opcode & 0x00FF;
+   uint16_t pc_before = chip8->pc - 2;  // Address where this opcode was fetched
+   printf("\n PC:[0x%04X] OP:0x%04X ASM:", pc_before, opcode);
 
-   // Execute opcode
-   switch(opcode & 0xF000) {
-      case 0x0000:
-         switch(opcode) {
-            case 0x00E0: // Clear screen
-               memset(chip8->display, 0, sizeof(chip8->display));
-               chip8->draw_flag = true;
-               break;
-            case 0x00EE: // Return from subroutine
-               chip8->sp--;
-               chip8->pc = chip8->stack[chip8->sp];
-               break;
-         }
-         break;
-         
-      case 0x1000: // 1nnn - Jump to address nnn
-         chip8->pc = nnn;
-         break;
-         
-      case 0x2000: // 2nnn - Call subroutine at nnn
-         chip8->stack[chip8->sp] = chip8->pc;
-         chip8->sp++;
-         chip8->pc = nnn;
-         break;
-         
-      case 0x3000: // 3xkk - Skip if Vx == kk
-         if(chip8->V[x] == kk) chip8->pc += 2;
-         break;
-         
-      case 0x4000: // 4xkk - Skip if Vx != kk
-         if(chip8->V[x] != kk) chip8->pc += 2;
-         break;
-         
-      case 0x5000: // 5xy0 - Skip if Vx == Vy
-         if(chip8->V[x] == chip8->V[y]) chip8->pc += 2;
-         break;
-         
-      case 0x6000: // 6xkk - Set Vx = kk
-         chip8->V[x] = kk;
-         break;
-         
-      case 0x7000: // 7xkk - Add kk to Vx
-         chip8->V[x] += kk;
-         break;
-         
-      case 0x8000:
-         switch(n) {
-            case 0x0: // 8xy0 - Set Vx = Vy
-               chip8->V[x] = chip8->V[y];
-               break;
-            case 0x1: // 8xy1 - Set Vx = Vx OR Vy
-               chip8->V[x] |= chip8->V[y];
-               break;
-            case 0x2: // 8xy2 - Set Vx = Vx AND Vy
-               chip8->V[x] &= chip8->V[y];
-               break;
-            case 0x3: // 8xy3 - Set Vx = Vx XOR Vy
-               chip8->V[x] ^= chip8->V[y];
-               break;
-            case 0x4: // 8xy4 - Add Vy to Vx, set VF on carry
-               {
-                  uint16_t sum = chip8->V[x] + chip8->V[y];
-                  chip8->V[0xF] = (sum > 0xFF) ? 1 : 0;
-                  chip8->V[x] = sum & 0xFF;
-               }
-               break;
-            case 0x5: // 8xy5 - Subtract Vy from Vx, set VF on NOT borrow
-               chip8->V[0xF] = (chip8->V[x] > chip8->V[y]) ? 1 : 0;
-               chip8->V[x] -= chip8->V[y];
-               break;
-            case 0x6: // 8xy6 - Shift Vx right by 1, set VF to LSB
-               chip8->V[0xF] = chip8->V[x] & 0x1;
-               chip8->V[x] >>= 1;
-               break;
-            case 0x7: // 8xy7 - Set Vx = Vy - Vx, set VF on NOT borrow
-               chip8->V[0xF] = (chip8->V[y] > chip8->V[x]) ? 1 : 0;
-               chip8->V[x] = chip8->V[y] - chip8->V[x];
-               break;
-            case 0xE: // 8xyE - Shift Vx left by 1, set VF to MSB
-               chip8->V[0xF] = (chip8->V[x] & 0x80) >> 7;
-               chip8->V[x] <<= 1;
-               break;
-         }
-         break;
-         
-      case 0x9000: // 9xy0 - Skip if Vx != Vy
-         if(chip8->V[x] != chip8->V[y]) chip8->pc += 2;
-         break;
-         
-      case 0xA000: // Annn - Set I = nnn
-         chip8->I = nnn;
-         break;
-         
-      case 0xB000: // Bnnn - Jump to nnn + V0
-         chip8->pc = nnn + chip8->V[0];
-         break;
-         
-      case 0xC000: // Cxkk - Set Vx = random byte AND kk
-         chip8->V[x] = (rand() % 256) & kk;
-         break;
-         
-      case 0xD000: // Dxyn - Draw sprite at (Vx, Vy) with n bytes of sprite data
-         {
-            uint8_t x_pos = chip8->V[x] % DISPLAY_WIDTH;
-            uint8_t y_pos = chip8->V[y] % DISPLAY_HEIGHT;
-            chip8->V[0xF] = 0;
-            
-            for(int row = 0; row < n; row++) {
-               uint8_t sprite_byte = chip8->memory[chip8->I + row];
-               
-               for(int col = 0; col < 8; col++) {
-                  if((sprite_byte & (0x80 >> col)) != 0) {
-                     int pixel_x = (x_pos + col) % DISPLAY_WIDTH;
-                     int pixel_y = (y_pos + row) % DISPLAY_HEIGHT;
-                     int pixel_index = pixel_y * DISPLAY_WIDTH + pixel_x;
-                     
-                     if(chip8->display[pixel_index] == 1) {
-                        chip8->V[0xF] = 1;
-                     }
-                     chip8->display[pixel_index] ^= 1;
-                  }
-               }
-            }
+   // Decode opcode
+   // now we need to decode the opcoded 16 breaking down into bits and bytes
+   // Bit MASKING
+   /*
+        Opcode:    1101 0010 1011 1100  (0xD2BC)
+        Mask:      0000 1111 1111 1111  (0x0FFF)
+        Result:    0000 0010 1011 1100  (0x02BC = nnn)
+
+        Opcode:    1101 0010 1011 1100  (0xD2BC)
+        Mask:      0000 1111 0000 0000  (0x0F00)
+        Result:    0000 0010 0000 0000  (0x0200)
+        Shift >>8: 0000 0000 0000 0010  (0x02 = x)
+   */
+
+   uint8_t first_nibble = (opcode & 0xF000) >> 12;  // 1111 0000 0000 0000             
+   uint8_t x = (opcode & 0x0F00) >> 8;              // 0000 1111 0000 0000             
+   uint8_t y = (opcode & 0x00F0) >> 4;              // 0000 0000 1111 0000
+   uint8_t n = opcode & 0x000F;                     // 0000 0000 0000 1111
+   uint8_t kk = opcode & 0x00FF;                    // 0000 0000 1111 1111
+   uint16_t nnn = opcode & 0x0FFF;                  // 0000 1111 1111 1111
+   // opcode                                        // 1111 1111 1111 1111
+
+   switch (first_nibble) {
+      case 0x0:
+         if (kk == 0xE0) { // Clear Screen 
+            printf("CLS (Clear Screen)");
+            memset(chip8->display, 0, sizeof(chip8->display));
             chip8->draw_flag = true;
+            break;
+         } else if (kk == 0xEE) { // Return from subroutine
+            printf("RET (Return from subroutine)");
+            chip8->sp--;
+            chip8->pc = chip8->stack[chip8->sp];
+            break;
+         } else {
+             printf("SYS 0x%03X (ignore)", nnn); // Backward compatiblity
          }
-         break;
-         
-      case 0xE000:
-         switch(kk) {
-            case 0x9E: // Ex9E - Skip if key in Vx is pressed
-               if(chip8->keypad[chip8->V[x]]) chip8->pc += 2;
-               break;
-            case 0xA1: // ExA1 - Skip if key in Vx is NOT pressed
-               if(!chip8->keypad[chip8->V[x]]) chip8->pc += 2;
-               break;
-         }
-         break;
-         
-      case 0xF000:
-         switch(kk) {
-            case 0x07: // Fx07 - Set Vx = delay timer
-               chip8->V[x] = chip8->delay_timer;
-               break;
-            case 0x0A: // Fx0A - Wait for key press, store in Vx
-               {
-                  bool key_pressed = false;
-                  for(int i = 0; i < 16; i++) {
-                     if(chip8->keypad[i]) {
-                        chip8->V[x] = i;
-                        key_pressed = true;
-                        break;
-                     }
-                  }
-                  if(!key_pressed) chip8->pc -= 2; // Try again next cycle
-               }
-               break;
-            case 0x15: // Fx15 - Set delay timer = Vx
-               chip8->delay_timer = chip8->V[x];
-               break;
-            case 0x18: // Fx18 - Set sound timer = Vx
-               chip8->sound_timer = chip8->V[x];
-               break;
-            case 0x1E: // Fx1E - Set I = I + Vx
-               chip8->I += chip8->V[x];
-               break;
-            case 0x29: // Fx29 - Set I to location of sprite for digit Vx
-               chip8->I = chip8->V[x] * 5; // Each sprite is 5 bytes
-               break;
-            case 0x33: // Fx33 - Store BCD representation of Vx in memory
-               chip8->memory[chip8->I] = chip8->V[x] / 100;
-               chip8->memory[chip8->I + 1] = (chip8->V[x] / 10) % 10;
-               chip8->memory[chip8->I + 2] = chip8->V[x] % 10;
-               break;
-            case 0x55: // Fx55 - Store V0 to Vx in memory starting at I
-               for(int i = 0; i <= x; i++) {
-                  chip8->memory[chip8->I + i] = chip8->V[i];
-               }
-               break;
-            case 0x65: // Fx65 - Read V0 to Vx from memory starting at I
-               for(int i = 0; i <= x; i++) {
-                  chip8->V[i] = chip8->memory[chip8->I + i];
-               }
-               break;
-         }
-         break;
-         
-      default:
-         printf("Unknown opcode: 0x%04X\n", opcode);
-         break;
-   }
+      break;  // 0x0 end
+
+      case 0x1: // 1nnn jump to address
+         /*
+             opcode = 0x1234
+             first_nibble = 0x1
+             nnn = 0x234  // Jump target address
+             
+             // Execution:
+             chip8->pc = 0x234;  // Program continues from address 0x234
+         */
+         printf("JP 0x%03X (Jump to add 0x%3X)",nnn,nnn);
+         chip8->pc = nnn;
+      break; // 0x1 end
+      
+      case 0x2: // 2nnn - Call subroutine at nnn
+         /*
+               Calls a subroutine at address nnn
+               Saves return address on the stack before jumping
+               Like a function call in high-level languages
+         */
+         printf("CALL 0x%03X (Call Subroutine at 0x%03X)", nnn,nnn);
+         chip8->stack[chip8->sp] = chip8->pc; //save return address
+         chip8->sp++;                         // move stack pointer up
+         chip8->pc = nnn;                     // jump to subroutines
+
+      break; // 0x2 end
+
+      case 0x3: // 3xkk - Skip if Vx == kk
+         /*
+              Compares register Vx with immediate value kk
+              Skips next instruction if they are equal
+              Conditional skip - doesn't always execute
+            */
+         printf("SE V%X, 0x%02X (Skip V[%X]==kk[0x%02X])", x, kk , x , kk);
+         if(chip8->V[x] == kk) chip8->pc += 2;
+      break; // 0x3 end
+      
+   } // switch end 
+
 }

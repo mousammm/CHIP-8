@@ -1,21 +1,7 @@
       case 0xF000:
          switch(kk) {
-            case 0x07: // Fx07 - Set Vx = delay timer
-               chip8->V[x] = chip8->delay_timer;
-               break;
             case 0x0A: // Fx0A - Wait for key press, store in Vx
-               {
-                  bool key_pressed = false;
-                  for(int i = 0; i < 16; i++) {
-                     if(chip8->keypad[i]) {
-                        chip8->V[x] = i;
-                        key_pressed = true;
-                        break;
-                     }
-                  }
-                  if(!key_pressed) chip8->pc -= 2; // Try again next cycle
-               }
-               break;
+              break;
             case 0x15: // Fx15 - Set delay timer = Vx
                chip8->delay_timer = chip8->V[x];
                break;

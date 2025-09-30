@@ -370,6 +370,34 @@ void chip8_cycle(chip8_t *chip8){
         }
       break; // 0xE end
  
+      case 0xF: // Miscellaneous Operation handles timers memory sound and input 
+         switch (kk) {
+
+            case 0x07: // 0xFx07 - LD Vx, DT (Read Delay Timer)
+               printf("LD V%X, DT (Read Delay timer)", x);
+               chip8->V[x] = chip8->delay_timer;
+            break; // 0x07 end
+
+            case 0x0A: // 0xFx0A - LD Vx, K (Wait for Key Press)
+               printf("LD V%X, K (Watit for key press)", x);
+               {
+                  bool key_pressed = false;
+                  for(int i = 0; i < 16; i++) {
+                     if(chip8->keypad[i]) {
+                        chip8->V[x] = i;
+                        key_pressed = true;
+                        break;
+                     }
+                  }
+                  if(!key_pressed) chip8->pc -= 2; // Try again next cycle
+               }
+              break; // 0x0A end
+
+         } // switch (kk) end
+      break; // 0xF end
+
    } // switch end 
 
 }
+
+

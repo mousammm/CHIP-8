@@ -3,6 +3,8 @@
 #include "sdl/sdl.h"
 #include "chip8/chip8.h"
 
+#define TARGET_FPS 500
+#define FPS (1000 / TARGET_FPS )
 
 int main(int argc,char **argv){
 
@@ -28,6 +30,7 @@ int main(int argc,char **argv){
 
    // sdl show display
    bool running = true;
+   
    while (running) {
 
       //handle inputs
@@ -45,7 +48,7 @@ int main(int argc,char **argv){
       }
 
       SDL_Delay(FPS);
-    }
+    } // while end 
 
    printf("\n");
    // sdl cleanup

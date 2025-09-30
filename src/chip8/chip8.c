@@ -391,11 +391,56 @@ void chip8_cycle(chip8_t *chip8){
                   }
                   if(!key_pressed) chip8->pc -= 2; // Try again next cycle
                }
-              break; // 0x0A end
+            break; // 0x0A end
 
+            case 0x15: // 0xFx15 - LD DT, Vx (Set Delay Timer)
+               printf("LD DT, V%X (SET DISPLAY TIMER)", x);
+               chip8->delay_timer = chip8->V[x];
+            break; // 0xF end 
+
+            case 0x18: // 0xFx18 - LD ST, Vx (Set Sound Timer)
+               printf("LD ST, V%X (SET SOUND TIMER)", x);
+               chip8->sound_timer = chip8->V[x];
+            break;
+
+            case 0x1E: // 0xFx1E - ADD I, Vx (Add to Index Register)
+               printf("ADD I, V%X (ADD TO INDEX REGISTER)", x);
+               chip8->I += chip8->V[x];
+            break;
+
+            case 0x29: // 0xFx29 - LD F, Vx (Load Font Character)
+               printf("LD F, V%X (LOAD FONT CHARACTER)", x);
+               chip8->I = chip8->V[x] * 5; // Each sprite is 5 bytes
+            break;
+
+            case 0x33: // 0xFx33 - LD B, Vx (BCD Conversion)
+               printf("LD B, V%X (BCD CONVERSION)", x);
+               chip8->memory[chip8->I] = chip8->V[x] / 100;
+               chip8->memory[chip8->I + 1] = (chip8->V[x] / 10) % 10;
+               chip8->memory[chip8->I + 2] = chip8->V[x] % 10;
+            break;
+
+            case 0x55: // 0xFx55 - LD [I], Vx (Store Registers to Memory)
+               printf("LD [I], V0-V%X (STORE REGISTER INTO MEMORY)", x);
+               for(int i = 0; i <= x; i++) {
+                  chip8->memory[chip8->I + i] = chip8->V[i];
+               }
+            break;
+
+            case 0x65: // 0xFx65 - LD Vx, [I] (Load Registers from Memory)
+               printf("LD V0-V%X, [I] (LOAD REGISTER INTO MEMORY)", x);
+               for(int i = 0; i <= x; i++) {
+                  chip8->V[i] = chip8->memory[chip8->I + i];
+               }
+            break;
+ 
          } // switch (kk) end
       break; // 0xF end
 
+      default:
+         printf("Unknown opcode: 0x%04X\n", opcode);
+      break;
+ 
    } // switch end 
 
 }

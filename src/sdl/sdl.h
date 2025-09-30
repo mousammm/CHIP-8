@@ -6,7 +6,7 @@
 #include "../chip8/chip8.h"
 
 #define SCALE_WINDOW 20
-#define TARGET_FPS 600
+#define TARGET_FPS 60
 #define FPS (1000 / TARGET_FPS )
 
 typedef struct {

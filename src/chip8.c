@@ -112,37 +112,18 @@ void chip8_cycle(chip8_t *chip8)
       break;  // 0x0 end
 
       case 0x1: // 1nnn jump to address
-         /*
-             opcode = 0x1234
-             first_nibble = 0x1
-             nnn = 0x234  // Jump target address
-             
-             // Execution:
-             chip8->pc = 0x234;  // Program continues from address 0x234
-         */
          printf("JP 0x%03X (Jump to add 0x%3X)",nnn,nnn);
          chip8->pc = nnn;
       break; // 0x1 end
       
       case 0x2: // 2nnn - Call subroutine at nnn
-         /*
-               Calls a subroutine at address nnn
-               Saves return address on the stack before jumping
-               Like a function call in high-level languages
-         */
          printf("CALL 0x%03X (Call Subroutine at 0x%03X)", nnn,nnn);
          chip8->stack[chip8->sp] = chip8->pc; //save return address
          chip8->sp++;                         // move stack pointer up
          chip8->pc = nnn;                     // jump to subroutines
-
       break; // 0x2 end
 
       case 0x3: // 3xkk - Skip if Vx == kk
-         /*
-              Compares register Vx with immediate value kk
-              Skips next instruction if they are equal
-              Conditional skip - doesn't always execute
-            */
          printf("SE V%X, 0x%02X (Skip next inst if V[%X]==kk[0x%02X])", x, kk , x , kk);
          if(chip8->V[x] == kk) chip8->pc += 2;
       break; // 0x3 end
@@ -163,15 +144,6 @@ void chip8_cycle(chip8_t *chip8)
       break; // 0x6 end 
  
       case 0x7: // 7xkk - Add kk to Vx
-         /*
-             opcode = 0x7105
-             first_nibble = 0x7
-             x = 0x1      // Register V1
-             kk = 0x05    // Value to add
-             
-             // Execution:
-             chip8->V[1] += 0x05;  // Simple addition (no carry flag)
-            */
          printf("ADD V%X, 0x%02X (Add V%X+=kk[0x%02X])", x, kk , x, kk);
          chip8->V[x] += kk;
       break; // 0x7 end

@@ -12,7 +12,7 @@
 #define NUM_PAD 16
 
 //chip8 define
-typedef struct  {
+typedef struct {
   uint8_t memory[MEMORY];                         // 4kb ram/memory
   uint8_t V[REGISTER];                            // 16 8-bit register VF=carry flag
   uint16_t I;                                     // Index register 
@@ -24,7 +24,7 @@ typedef struct  {
   uint8_t display[DISPLAY_WIDTH*DISPLAY_HEIGHT];  // 64*32 pixel display
   bool keypad[NUM_PAD];                           // keypad state [0-F]
   bool draw_flag;                                 // redraw flag 
-} chip8_t ;
+} chip8_t;
 
 //chip8 function declaration 
 void chip8_init(chip8_t *chip8);

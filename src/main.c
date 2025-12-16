@@ -1,60 +1,38 @@
 #include <stdio.h>   
-#include <stdlib.h>  // exit(EXIT_SUCCESS)
 #include "sdl.h"
 #include "chip8.h"
 
-#define TARGET_FPS 500
-#define FPS (1000 / TARGET_FPS )
+int main(int argc,char **argv)
+{
 
-int main(int argc,char **argv){
+    /* talking argument */ 
+    if (argc < 2) return 1;
 
-   if (argc < 2) {
-    fprintf(stderr,"Usage: %s <path/to/rom_file>\n",argv[0]);
-    return EXIT_FAILURE;
-   }
+    /* initialize chip8 */
+    chip8_t chip8 = {0};
+    chip8_init(&chip8);
 
-   //initialize chip8
-   chip8_t chip8 = {0};
-   chip8_init(&chip8);
+    /* loading rom */ 
+    if (!chip8_load_rom(&chip8,argv[1])) return 1;
 
-   // loading rom 
-   if (!chip8_load_rom(&chip8,argv[1])) {
-     printf("Failed to load ROM:%s\n",argv[1]);
-    return EXIT_FAILURE;
-   } 
+    // sdl initialisation
+    sdl_t sdl = {0};
+    if(!sdl_init(&sdl)) return 1;
 
-   //sdl initialisation
-   sdl_t sdl = {0};
-   if(!sdl_init(&sdl)) exit(EXIT_FAILURE);
-   printf("SDL Initialise successful!\n");
+    
+    while (sdl_handle_inputs(&chip8)) {
 
-   // sdl show display
-   bool running = true;
-   
-   while (running) {
+       chip8_cycle(&chip8);     // chip8 one cycle
+       chip8_timers(&chip8);    // update timers 
+       
+       if (chip8.draw_flag) {   // render frame 
+          sdl_render_frame(&sdl,&chip8);
+       }
 
-      //handle inputs
-      running = sdl_handle_inputs(&chip8);
+       SDL_Delay(2);
+     } 
 
-      // chip8 one cycle
-      chip8_cycle(&chip8);
-
-      //update timers 
-      chip8_timers(&chip8);
-
-      // render frame 
-      if (chip8.draw_flag) {
-         sdl_render_frame(&sdl,&chip8);
-      }
-
-      SDL_Delay(FPS);
-    } // while end 
-
-   printf("\n");
-   // sdl cleanup
-   sdl_cleanup(&sdl);
-   printf("SDL cleanup Successful!\n");
-
-   exit(EXIT_SUCCESS);
+    sdl_cleanup(&sdl);          // cleanup
+    return 0;
 }
 

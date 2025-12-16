@@ -1,6 +1,6 @@
 # CHIP-8 Emulator
 
-A complete, educational CHIP-8 emulator written in C using SDL2 for graphics and input handling. This project serves as both a functional emulator and a comprehensive learning resource for understanding emulation fundamentals.
+A complete, educational CHIP-8 emulator using SDL2 and C.
 
 ![CHIP-8 logo](asset/c8-logo.png)
 
@@ -18,7 +18,7 @@ A complete, educational CHIP-8 emulator written in C using SDL2 for graphics and
 - GCC compiler
 - SDL2 development libraries
 
-### Using Make (if Makefile is provided):
+### build
 ```bash
 make
 ```

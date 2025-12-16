@@ -1,22 +1,53 @@
-# CHIP8 Readme added
-tools - gcc gnumake SDL2 [if ur using nix type nix-shell]
+# CHIP-8 Emulator
 
-so on sep/30/2035 1:37pm i have completed the base chi8 with a debunk debugger
+A complete, educational CHIP-8 emulator written in C using SDL2 for graphics and input handling. This project serves as both a functional emulator and a comprehensive learning resource for understanding emulation fundamentals.
 
-|-octo- npm install -g octo
-|
-|-next one is a disassemblers (ROMS -> ASM)
-|  octo --disasm game.ch8 > game.8o
-|
-|- chip8 assembler (ASM -> ROM)
-|  octo game.8o game.ch8 
+![CHIP-8 logo](asset/c8-logo.png)
 
+## Features
 
-but fuuuck that we will create our own in python !!!
+- **Full CHIP-8 Instruction Set**: Implements all 35 original CHIP-8 instructions
+- **SDL2 Graphics**: Clean display with 20x scaling (1280×640 window)
+- **Accurate Input**: Hexadecimal keypad mapping with proper keyboard input
+- **Sound Support**: Basic beep sound via console output (easily extendable)
+- **Performance**: Runs at approximately 500Hz with proper timing
+- **Educational Design**: Well-commented code with detailed explanations of emulation concepts
 
-AND for simple hex edit direct ROM modification
-# Install hex editor
-sudo apt install hexedit
+### Prerequisites
 
-# Edit ROM directly
-h
+- GCC compiler
+- SDL2 development libraries
+
+### Using Make (if Makefile is provided):
+```bash
+make
+```
+
+## Usage
+
+```bash
+./bin/chip8 <path-to-rom>
+```
+
+### Key Mapping
+The CHIP-8 hexadecimal keypad (4×4) is mapped to your keyboard:
+
+```
+CHIP-8 Keypad      Keyboard Layout
+┌───┬───┬───┬───┐    ┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ C │    │ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┤    ├───┼───┼───┼───┤
+│ 4 │ 5 │ 6 │ D │    │ Q │ W │ E │ R │
+├───┼───┼───┼───┤    ├───┼───┼───┼───┤
+│ 7 │ 8 │ 9 │ E │    │ A │ S │ D │ F │
+├───┼───┼───┼───┤    ├───┼───┼───┼───┤
+│ A │ 0 │ B │ F │    │ Z │ X │ C │ V │
+└───┴───┴───┴───┘    └───┴───┴───┴───┘
+```
+
+- **ESC**: Exit the emulator
+
+### Adding Debug Output
+Uncomment or add `printf` statements in `chip8_cycle()` to trace instruction execution.
+
+---

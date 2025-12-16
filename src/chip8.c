@@ -76,7 +76,7 @@ void chip8_timers(chip8_t *chip8){
    }
    if (chip8->sound_timer > 0) { 
       if (chip8->sound_timer == 1) { 
-         printf("kela!\n");
+         printf("Beep!\n");
       }
       chip8->sound_timer--;
    }

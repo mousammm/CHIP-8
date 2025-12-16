@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "sdl.h"
-#include "../chip8/chip8.h"
+#include "chip8.h"
 
 bool sdl_init(sdl_t *sdl){
      if ((SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) !=0 )) {

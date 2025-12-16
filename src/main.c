@@ -1,7 +1,7 @@
 #include <stdio.h>   
 #include <stdlib.h>  // exit(EXIT_SUCCESS)
-#include "sdl/sdl.h"
-#include "chip8/chip8.h"
+#include "sdl.h"
+#include "chip8.h"
 
 #define TARGET_FPS 500
 #define FPS (1000 / TARGET_FPS )

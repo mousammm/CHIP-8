@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#include "../chip8/chip8.h"
+#include "chip8.h"
 
 #define SCALE_WINDOW 20
 

@@ -1,10 +1,10 @@
 # CHIP-8 ARCHITECTURE: Memory & Instruction Design
 
-## 🧠 **1. Memory Structure**
+## **1. Memory Structure**
 
 **CHIP-8 has *4KB* of memory/RAM** - let's visualize this fundamental component.
 
-### 🔢 **Memory as an Array**
+### **Memory as an Array**
 Think of the memory as **an array of 4096 elements**, where *each element* can hold up to:
 
 - **1 byte (8 bits)** of data
@@ -16,9 +16,9 @@ Think of the memory as **an array of 4096 elements**, where *each element* can h
 
 ---
 
-## ⚡ **Why Memory Structure Matters: OPCODES**
+## **Why Memory Structure Matters: OPCODES**
 
-### 🎯 **The Critical Connection**
+### **The Critical Connection**
 **CHIP-8 instructions (OPCODES) are made of *2 bytes***. 
 
 This means:
@@ -29,9 +29,9 @@ This means:
 
 ---
 
-## ⚠️ **CRITICAL DISTINCTION**
+## ⚠️**CRITICAL DISTINCTION**
 
-> 🚨 **[[!NOTE]]**
+> **[[!NOTE]]**
 > **Do NOT confuse the *value* a single element holds with the *address* of the element!**
 > 
 > **Example:**
@@ -54,7 +54,7 @@ Visual Block
 
 ---
 
-## 🎯 **Why This Knowledge is Essential**
+## **Why This Knowledge is Essential**
 
 We need this understanding to:
 - **Decode instructions** properly from memory

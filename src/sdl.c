@@ -24,14 +24,15 @@ bool sdl_init(sdl_t *sdl)
     return true;
 }
 
-void sdl_cleanup(sdl_t *sdl){
+void sdl_cleanup(sdl_t *sdl)
+{
     if(sdl->window) SDL_DestroyWindow(sdl->window);
     if(sdl->renderer) SDL_DestroyRenderer(sdl->renderer);
     SDL_Quit();
 }
 
-void sdl_render_frame(sdl_t *sdl, chip8_t *chip8){
-
+void sdl_render_frame(sdl_t *sdl, chip8_t *chip8)
+{
     // Clear screen with black background
     SDL_SetRenderDrawColor(sdl->renderer, 0, 0, 0, 255);    // RGBA: Black
     SDL_RenderClear(sdl->renderer);                         // Fill entire renderer
@@ -65,7 +66,8 @@ void sdl_render_frame(sdl_t *sdl, chip8_t *chip8){
     chip8->draw_flag = false;
 }
 
-bool sdl_handle_inputs(chip8_t *chip8){
+bool sdl_handle_inputs(chip8_t *chip8)
+{
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {

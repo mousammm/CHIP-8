@@ -177,11 +177,6 @@ void chip8_cycle(chip8_t *chip8)
             break; // 0x3 end 
 
             case 0x4: // 8xy4 - ADD Vx, Vy (with carry)
-               /* V1 + V2 = 0x80 + 0x90 = 0x110 (272 in decimal)
-                  Result:
-                  V1 = 0x10  // Only keep lower 8 bits
-                  VF = 1     // Carry flag set because 0x110 > 0xFF
-                  */
                printf("ADD V%X, V%X (ADD with CARRY)", x , y );
                uint16_t sum = chip8->V[x] + chip8->V[y];
                chip8->V[x] = sum & 0xFF;
@@ -189,42 +184,24 @@ void chip8_cycle(chip8_t *chip8)
             break; // 0x4 end 
 
             case 0x5: // 8xy5 - SUB Vx, Vy 
-               /*0x90 - 0x80 = 0x10
-                 Result:
-                 V1 = 0x10
-                 VF = 1     // No borrow needed (V1 > V2) */
                printf("SUB V%X, V%X (SUBTRACT)", x , y );
                chip8->V[0xF] = (chip8->V[x] > chip8->V[y]);
                chip8->V[x] -= chip8->V[y];
             break; // 0x5 end 
 
             case 0x6: // 8xy6 - SHR Vx, Vy 
-               /* Shift V1 right: 1000 0101 → 0100 0010 (0x42)
-                  Least significant bit was 1
-                  Result:
-                  V1 = 0x42
-                  VF = 1     // Carry = bit that was shifted out  */
                printf("SHR V%X, V%X (SHIFT RIGHT)", x , y );
                chip8->V[0xF] = chip8->V[x] &  0x1; // set carry flag to least significant bit 
                chip8->V[x] >>= 1;                  // shift right by 1
             break; // 0x6 end 
 
             case 0x7:// 8xy7 - SUB Vx, Vy 
-               /* V2 - V1 = 0x30 - 0x20 = 0x10
-                  Result:
-                  V1 = 0x10  // Result stored in V1
-                  VF = 1     // No borrow (V2 > V1) */
                printf("SUBN V%X, V%X (SUBTRACT REVERSED)", x , y );
                chip8->V[0xF] = (chip8->V[y] > chip8->V[x]);
                chip8->V[x] = chip8->V[y] - chip8->V[x];
             break; // 0x7 end 
 
             case 0xE:// 8xyE - SHL Vx, Vy
-               /* Shift V1 left: 1100 0001 → 1000 0010 (0x82)
-                  Most significant bit was 1
-                  Result:
-                  V1 = 0x82
-                  VF = 1     // Carry = bit that was shifted out */
                printf("SHL V%X, V%X (SHIFT LEFT)", x , y );
                chip8->V[0xF] = (chip8->V[x] &  0x80) >> 7; // set carry flag to most significant bit 
                chip8->V[x] <<= 1;                          // shift left by 1

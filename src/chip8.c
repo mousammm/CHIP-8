@@ -1,10 +1,9 @@
 #include "chip8.h"
 #include <stdio.h> 
-#include <stdlib.h> // rand
+#include <stdlib.h>
 #include <stdint.h> 
-#include <stdbool.h> 
 #include <time.h> 
-#include <string.h> // memset and memcpy 
+#include <string.h>
 
 // chip8 fontset 
 const uint8_t fontset[80] = {
@@ -26,65 +25,61 @@ const uint8_t fontset[80] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-void chip8_init(chip8_t *chip8){
-   memset(chip8,0,sizeof(chip8_t));
+void chip8_init(chip8_t *chip8)
+{
+    memset(chip8,0,sizeof(chip8_t));
 
-   // load font 
-   memcpy(&chip8->memory[0],fontset,sizeof(fontset));
+    // load font 
+    memcpy(&chip8->memory[0],fontset,sizeof(fontset));
 
-   // set program counter 
-   chip8->pc = 0x200;
-   chip8->draw_flag = true;
+    // set program counter 
+    chip8->pc = 0x200;
+    chip8->draw_flag = true;
 
-   // Seed random number generator
-   srand(time(NULL));
+    // Seed random number generator
+    srand(time(NULL));
 }
 
-bool chip8_load_rom(chip8_t *chip8,const char *filename){
+bool chip8_load_rom(chip8_t *chip8,const char *filename)
+{
+    // open file 
+    FILE *file = fopen(filename, "rb");
+    if(!file) {
+        fprintf(stderr, "Cannot open %s file\n", filename);
+        return false;
+    }
 
-   // open file 
-   FILE *file = fopen(filename, "rb");
-   if(!file){
-      fprintf(stderr, "Cannot open %s file\n",filename);
-      return false;
-   }
+    fseek(file,0,SEEK_END);
+    long size = ftell(file);
+    rewind(file);
 
-   fseek(file,0,SEEK_END);
-   long size = ftell(file);
-   rewind(file);
+    // Add size validation
+    if (size > (MEMORY - 0x200)) {
+        fprintf(stderr, "ROM too large: %ld bytes\n", size);
+        fclose(file);
+        return false;
+    }
 
-   // check if file is big
-   if(size > MEMORY - 0x200){
-      fprintf(stderr, "ROM too big: %ld bytes\n",size);
-      fclose(file);
-      return false;
-   }
-   
-   // read into the memory
-   if (!fread(&chip8->memory[0x200],1,size,file)) {
-      fprintf(stderr, "Cant read %s into memory!\n",filename);
-      return false;
-   }
+    // read into the memory
+    if (!fread(&chip8->memory[0x200],1,size,file)) return false;
 
-   fclose(file);
-   return true; 
+    fclose(file);
+    return true; 
 }
 
-void chip8_timers(chip8_t *chip8){
+void chip8_timers(chip8_t *chip8)
+{
    if (chip8->delay_timer > 0) { 
       chip8->delay_timer--;
    }
    if (chip8->sound_timer > 0) { 
-      if (chip8->sound_timer == 1) { 
-         printf("Beep!\n");
-      }
+      if (chip8->sound_timer == 1) printf("Beep!\n");
       chip8->sound_timer--;
    }
 }
 
-
-
-void chip8_cycle(chip8_t *chip8){
+void chip8_cycle(chip8_t *chip8)
+{
    /* Bitwise operation & bit masking
     chip8->memory[chip8->pc] << 8 = 0x12 << 8 = 0x1200
     chip8->memory[chip8->pc+1] = 0x34

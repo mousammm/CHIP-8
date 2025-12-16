@@ -216,9 +216,6 @@ void chip8_cycle(chip8_t *chip8)
       break; // 0x9
        
       case 0xA: // Annn - LD I, addr (Load Index Register with address)
-         /*     Loads a 12-bit address into the index register I
-               - A = opcode identifier (0xA)
-               - nnn = 12-bit address to load into I */
          printf("LD I, 0x%03X (LOADS 12bit into I)", nnn);
          chip8->I = nnn;
       break; // 0xA end 
@@ -229,20 +226,11 @@ void chip8_cycle(chip8_t *chip8)
       break; // 0xB end
         
       case 0xC: // Cxkk - RND Vx, byte (Random number generation)
-         /* Cxkk
-            Where:
-            - C = opcode identifier (0xC)
-            - x = register index (0-F)
-            - kk = 8-bit mask value */
          printf("RND V%X, 0x%02X (RANDOM NO MASK WITH KK)", x, kk);
          chip8->V[x] = (rand() % 256) & kk;
       break; // 0xC end
 
       case 0xD: // Dxyn - Draw sprite at (Vx, Vy) with n bytes of sprite data
-         /* - D = opcode identifier (0xD)
-              - x = X coordinate register index
-              - y = Y coordinate register index  
-              - n = sprite height in pixels (1-15) */
         {
            printf("DRW V%X, V%X, %d (Draw X[%X] Y[%X] HE[%d])", x, y, n , x, y, n);
 

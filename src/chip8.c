@@ -416,5 +416,3 @@ void chip8_cycle(chip8_t *chip8)
    } // switch end 
 
 }
-
-

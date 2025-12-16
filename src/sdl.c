@@ -1,123 +1,115 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-
 #include "sdl.h"
-#include "chip8.h"
 
-bool sdl_init(sdl_t *sdl){
-     if ((SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) !=0 )) {
-        fprintf(stderr, "Could not initialized SDL: %s\n",SDL_GetError());
-        return false; //failed
-     }   
+bool sdl_init(sdl_t *sdl)
+{
+    // Initialize SDL with video subsystem
+    if ((SDL_Init(SDL_INIT_VIDEO) !=0 )) return false; 
 
-   // create a window 
-    sdl->window = SDL_CreateWindow("Chip8",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,SCALE_WINDOW*DISPLAY_WIDTH,SCALE_WINDOW*DISPLAY_HEIGHT,SDL_WINDOW_SHOWN);
-    if (!sdl->window) {
-        fprintf(stderr, "Could not create Window: %s\n",SDL_GetError());
-        return false; //failed
-    }
-
-   // create a renderer 
-   sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-     if (!sdl->renderer) {
-        fprintf(stderr, "Could not create Render: %s\n",SDL_GetError());
-        return false; //failed
-    }
+    // Create window
+    sdl->window = SDL_CreateWindow(
+        "Chip8",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        SCALE_WINDOW*DISPLAY_WIDTH,
+        SCALE_WINDOW*DISPLAY_HEIGHT,
+        SDL_WINDOW_SHOWN);
+    if (!sdl->window) return false;
+    
+    // Create renderer 
+    sdl->renderer = SDL_CreateRenderer(sdl->window, -1, 0);
+    if (!sdl->renderer) return false; 
+    
     return true;
 }
 
 void sdl_cleanup(sdl_t *sdl){
-     if(sdl->window) SDL_DestroyWindow(sdl->window);
-     if(sdl->renderer) SDL_DestroyRenderer(sdl->renderer);
-     SDL_Quit();
+    if(sdl->window) SDL_DestroyWindow(sdl->window);
+    if(sdl->renderer) SDL_DestroyRenderer(sdl->renderer);
+    SDL_Quit();
 }
 
 void sdl_render_frame(sdl_t *sdl, chip8_t *chip8){
-       SDL_SetRenderDrawColor(sdl->renderer,0,0,0,255); // set bg color black
-       SDL_RenderClear(sdl->renderer); // clear initial renderer
 
-      //draw pixel with white color 
-       SDL_SetRenderDrawColor(sdl->renderer,255,255,255,255); // set fg color white
+    // Clear screen with black background
+    SDL_SetRenderDrawColor(sdl->renderer, 0, 0, 0, 255);    // RGBA: Black
+    SDL_RenderClear(sdl->renderer);                         // Fill entire renderer
+
+    // Set pixel color to white
+    SDL_SetRenderDrawColor(sdl->renderer, 255, 255, 255, 255);  // RGBA: White
     
-    /*
-           Display grid:
-           [1][0][1]  (y=0: indices 0,1,2)
-           [0][1][0]  (y=1: indices 3,4,5) 
-           [1][0][1]  (y=2: indices 6,7,8)
-
-           y=0, x=0
-           chip8->display[0 * 3 + 0] = chip8->display[0] = 1 → DRAW
-           
-           y=0, x=1
-           chip8->display[0 * 3 + 1] = chip8->display[1] = 0 → SKIP
-
-           basically the for loop is checking the every value in 
-           chip8->[64*32] is 0 or 1 if its 1 draw 
-    */
-       
-        for (int y = 0; y < DISPLAY_HEIGHT; y++) {
-        for (int x = 0; x < DISPLAY_WIDTH; x++) {
-            if (chip8->display[y * DISPLAY_WIDTH + x]) {
+    // Draw CHIP-8 display pixels
+    for (int y = 0; y < DISPLAY_HEIGHT; y++)
+    {
+        for (int x = 0; x < DISPLAY_WIDTH; x++) 
+        {
+            // Check if pixel is ON (non-zero) in CHIP-8 display buffer
+            if (chip8->display[y * DISPLAY_WIDTH + x]) 
+            {
+                // Create scaled rectangle for pixel
                 SDL_Rect pixel = {
-                    x * SCALE_WINDOW,
-                    y * SCALE_WINDOW,
-                    SCALE_WINDOW,
-                    SCALE_WINDOW,
+                    x * SCALE_WINDOW,      // X position (scaled)
+                    y * SCALE_WINDOW,      // Y position (scaled)
+                    SCALE_WINDOW,          // Width (20 pixels)
+                    SCALE_WINDOW           // Height (20 pixels)
                 };
+                // Fill the rectangle
                 SDL_RenderFillRect(sdl->renderer, &pixel);
             }
         }
     }
 
-      SDL_RenderPresent(sdl->renderer); // show actual window/update display
-      chip8->draw_flag = false;
-       
+    // Update display
+    SDL_RenderPresent(sdl->renderer);  // Show rendered frame
+    chip8->draw_flag = false;
 }
 
 bool sdl_handle_inputs(chip8_t *chip8){
     SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
-            case SDL_QUIT:
-                return false; // no break needed
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_QUIT: return false; 
                 
             case SDL_KEYDOWN:
 
             case SDL_KEYUP:
+            {
+                bool pressed = (event.type == SDL_KEYDOWN);
+                uint8_t key = 0xFF;
+                
+                switch(event.key.keysym.sym)
                 {
-                    bool pressed = (event.type == SDL_KEYDOWN);
-                    uint8_t key = 0xFF;
-                    
-                    switch(event.key.keysym.sym) {
-                        case SDLK_1: key = 0x1; break;
-                        case SDLK_2: key = 0x2; break;
-                        case SDLK_3: key = 0x3; break;
-                        case SDLK_4: key = 0xC; break;
-                        case SDLK_q: key = 0x4; break;
-                        case SDLK_w: key = 0x5; break;
-                        case SDLK_e: key = 0x6; break;
-                        case SDLK_r: key = 0xD; break;
-                        case SDLK_a: key = 0x7; break;
-                        case SDLK_s: key = 0x8; break;
-                        case SDLK_d: key = 0x9; break;
-                        case SDLK_f: key = 0xE; break;
-                        case SDLK_z: key = 0xA; break;
-                        case SDLK_x: key = 0x0; break;
-                        case SDLK_c: key = 0xB; break;
-                        case SDLK_v: key = 0xF; break;
-                        case SDLK_ESCAPE: 
-                            if (pressed) return false;
-                            break;
-                    }
-                    
-                    if(key < 16) {
-                        chip8->keypad[key] = pressed;
-                    }
+                    case SDLK_1: key = 0x1; break;
+                    case SDLK_2: key = 0x2; break;
+                    case SDLK_3: key = 0x3; break;
+                    case SDLK_4: key = 0xC; break;
+                    case SDLK_q: key = 0x4; break;
+                    case SDLK_w: key = 0x5; break;
+                    case SDLK_e: key = 0x6; break;
+                    case SDLK_r: key = 0xD; break;
+                    case SDLK_a: key = 0x7; break;
+                    case SDLK_s: key = 0x8; break;
+                    case SDLK_d: key = 0x9; break;
+                    case SDLK_f: key = 0xE; break;
+                    case SDLK_z: key = 0xA; break;
+                    case SDLK_x: key = 0x0; break;
+                    case SDLK_c: key = 0xB; break;
+                    case SDLK_v: key = 0xF; break;
+                    case SDLK_ESCAPE: 
+                        if (pressed) return false;
                     break;
-                } // keyup end
-            
-        } // switch end
-    } // while end
+                }
+                
+                // Update CHIP-8 keypad state
+                if(key < 16) {
+                    chip8->keypad[key] = pressed;
+                }
+                break;
+            } 
+        } 
+    } 
     return true;
 }

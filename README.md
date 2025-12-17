@@ -8,7 +8,7 @@ A complete, educational CHIP-8 emulator using SDL2 and C.
 
 - **Full CHIP-8 Instruction Set**: Implements all 35 original CHIP-8 instructions
 - **SDL2 Graphics**: Clean display with 20x scaling (1280×640 window)
-- **Accurate Input**: Hexadecimal keypad mapping with proper keyboard input
+- **Input**: Hexadecimal keypad mapping with proper keyboard input
 - **Sound Support**: Basic beep sound via console output (easily extendable)
 - **Performance**: Runs at approximately 500Hz with proper timing
 - **Educational Design**: Well-commented code with detailed explanations of emulation concepts
@@ -26,7 +26,7 @@ make
 ## Usage
 
 ```bash
-./bin/chip8 <path-to-rom>
+./build/chip8 <path-to-rom>
 ```
 
 ### Key Mapping

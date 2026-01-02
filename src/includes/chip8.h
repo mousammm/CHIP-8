@@ -1,5 +1,4 @@
-#ifndef CHIP8_H
-#define CHIP8_H
+#pragma once
 
 #include <stdint.h> 
 #include <stdbool.h> 
@@ -31,5 +30,3 @@ void chip8_init(chip8_t *chip8);
 bool chip8_load_rom(chip8_t *chip8, const char *filename);
 void chip8_cycle(chip8_t *chip8);
 void chip8_timers(chip8_t *chip8);
-
-#endif // CHIP8_H

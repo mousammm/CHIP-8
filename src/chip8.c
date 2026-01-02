@@ -1,9 +1,9 @@
-#include "chip8.h"
 #include <stdio.h> 
 #include <stdlib.h>
 #include <stdint.h> 
 #include <time.h> 
 #include <string.h>
+#include "chip8.h"
 
 // chip8 fontset 
 const uint8_t fontset[80] = {

@@ -1,5 +1,4 @@
-#ifndef SDL_H
-#define SDL_H
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
@@ -17,5 +16,3 @@ bool sdl_init(sdl_t *sdl);
 void sdl_cleanup(sdl_t *sdl);
 void sdl_render_frame(sdl_t *sdl,chip8_t *chip8);
 bool sdl_handle_inputs(chip8_t *chip8);
-
-#endif 

@@ -1,11 +1,14 @@
 #include "sdl.h"
 #include "chip8.h"
+#include <stdio.h>
 
 int main(int argc,char **argv)
 {
-
     /* talking argument */ 
-    if (argc < 2) return 1;
+    if (argc < 2){
+      fprintf(stderr, "Usage <path/to/rom>");
+      return 1;
+    } 
 
     /* initialize chip8 */
     chip8_t chip8 = {0};

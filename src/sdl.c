@@ -67,14 +67,11 @@ void sdl_render_frame(sdl_t *sdl, chip8_t *chip8)
 bool sdl_handle_inputs(chip8_t *chip8)
 {
     SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        switch (event.type)
-        {
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
             case SDL_QUIT: return false; 
                 
             case SDL_KEYDOWN:
-
             case SDL_KEYUP:
             {
                 bool pressed = (event.type == SDL_KEYDOWN);

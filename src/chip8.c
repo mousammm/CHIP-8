@@ -80,11 +80,11 @@ void chip8_timers(chip8_t *chip8)
 
 void chip8_cycle(chip8_t *chip8)
 {
+   uint16_t cur_pc = chip8->pc;  // Address where this opcode was fetched
    uint16_t opcode = (chip8->memory[chip8->pc] << 8) | chip8->memory[chip8->pc+1];
    chip8->pc += 2;
 
-   uint16_t pc_before = chip8->pc - 2;  // Address where this opcode was fetched
-   printf("\n PC:[0x%04X] OP:0x%04X ASM:", pc_before, opcode);
+   printf("\n PC:[0x%04X] OP:0x%04X ASM:", cur_pc, opcode);
 
    uint8_t first_nibble = (opcode & 0xF000) >> 12;  // 1111 0000 0000 0000 
    uint8_t x = (opcode & 0x0F00) >> 8;              // 0000 1111 0000 0000
